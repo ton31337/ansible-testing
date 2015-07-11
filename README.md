@@ -8,9 +8,7 @@
 10.0.0.3 myid=3
 
 [kafka]
-10.0.0.2
-10.0.0.3
-10.0.0.4
+10.0.0.2 broker_id=1
 ```
 
 ## Install Zookeeper
