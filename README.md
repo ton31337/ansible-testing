@@ -1,4 +1,6 @@
-# /etc/ansible/hosts
+# Configuration
+
+## /etc/ansible/hosts
 ```
 [zookeeper]
 10.0.0.1 myid=1
@@ -9,4 +11,9 @@
 10.0.0.2
 10.0.0.3
 10.0.0.4
+```
+
+## Install Zookeeper
+```
+$ ansible-playbook zookeeper/zookeeper.yml
 ```
