@@ -14,8 +14,10 @@
       get_url: url=http://apache.mirror.serveriai.lt/zookeeper/zookeeper-{{version}}/zookeeper-{{version}}.tar.gz dest=/opt
     - name: Extract Zookeeper source
       unarchive: src=/opt/zookeeper-{{version}}.tar.gz dest=/opt copy=no
+    - name: Create Zookeeper data directory
+      file: path=/opt/zookeeper-{{version}}/data state=directory
     - name: Configure Zookeeper myid
-      template: src=templates/myid.j2 dest=/opt/zookeeper-{{version}}/conf/myid
+      template: src=templates/myid.j2 dest=/opt/zookeeper-{{version}}/data/myid
     - name: Configure Zookeeper zoo.cfg
       template: src=templates/zoo.cfg.j2 dest=/opt/zookeeper-{{version}}/conf/zoo.cfg
     - name: Start Zookeeper
