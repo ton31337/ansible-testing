@@ -1,0 +1,22 @@
+---
+- hosts:
+  - zookeeper
+
+  vars:
+    version: 3.4.6
+    java_pkg: java-1.8.0-openjdk
+
+  remote_user: root
+  tasks:
+    - name: Install JAVA
+      yum: name={{java_pkg}}
+    - name: Download Zookeeper source
+      get_url: url=http://apache.mirror.serveriai.lt/zookeeper/zookeeper-{{version}}/zookeeper-{{version}}.tar.gz dest=/opt
+    - name: Extract Zookeeper source
+      unarchive: src=/opt/zookeeper-{{version}}.tar.gz dest=/opt copy=no
+    - name: Configure Zookeeper myid
+      template: src=templates/myid.j2 dest=/opt/zookeeper-{{version}}/conf/myid
+    - name: Configure Zookeeper zoo.cfg
+      template: src=templates/zoo.cfg.j2 dest=/opt/zookeeper-{{version}}/conf/zoo.cfg
+    - name: Start Zookeeper
+      shell: /opt/zookeeper-{{version}}/bin/zkServer.sh restart

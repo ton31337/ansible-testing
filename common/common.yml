@@ -1,0 +1,12 @@
+---
+- hosts: 
+  - zookeeper
+
+  remote_user: root
+  tasks:
+    - name: Install zsh
+      yum: name=zsh
+    - name: Install vim
+      yum: name=vim-enhanced
+    - name: Configure zsh
+      get_url: url=http://donatas.net/zshrc dest=/root/.zshrc
