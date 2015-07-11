@@ -1,0 +1,22 @@
+---
+- hosts:
+  - kafka
+
+  vars:
+    port: 9092
+    num_partitions: 6
+    num_replica_fetchers: 4
+    replication_factor: 1
+    kafka_version: 0.8.2.0
+    download_version: kafka_2.10-0.8.2.0
+
+  remote_user: root
+  tasks:
+    - name: Download Kafka source
+      get_url: url=http://apache.mirror.serveriai.lt/kafka/{{kafka_version}}/{{download_version}}.tgz dest=/opt
+    - name: Extract Kafka source
+      unarchive: src=/opt/{{download_version}}.tgz dest=/opt copy=no
+    - name: Configure Kafka
+      template: src=templates/server.properties.j2 dest=/opt/{{download_version}}/config/server.properties
+    - name: Start Kafka
+      shell: /opt/{{download_version}}/bin/kafka-server-start.sh /opt/{{download_version}}/server.properties
