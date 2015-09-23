@@ -1,0 +1,46 @@
+---
+###
+# Elastic Rolling restart using Ansible
+# Usage:
+# $ ansible-playbook -vv -i lw_elastics rolling_restart_elastic.yml
+# $ ansible-playbook -vv -i host1.example.com, rolling_restart_elastic.yml (single host override)
+###
+
+- hosts: all
+  remote_user: root
+  gather_facts: False
+  serial: 1
+
+  tasks:
+  - name: cluster routing none
+    shell: "curl -XPUT localhost:9200/_cluster/settings -d '{\"transient\" : {\"cluster.routing.allocation.enable\" : \"none\" }}'"
+    register: result
+    until: result.stdout.find('"acknowledged"') != -1
+    retries: 180
+    delay: 10
+    changed_when: result.stdout.find('"acknowledged":true') != -1
+
+  - name: restart elastic
+    service: name=elasticsearch state=restarted
+
+  - name: wait node to be up
+    shell: "curl -I -s -m 2 localhost:9200 | head -n 1"
+    register: result
+    until: result.stdout == "HTTP/1.1 200 OK"
+    retries: 180
+    delay: 10
+
+  - name: cluster routing all
+    shell: "curl -s -m 2 -XPUT localhost:9200/_cluster/settings -d '{\"transient\" : {\"cluster.routing.allocation.enable\" : \"all\" }}'"
+    register: result
+    until: result.stdout.find("acknowledged") != -1
+    retries: 180
+    delay: 10
+    changed_when: result.stdout.find('"acknowledged":true') != -1
+
+  - name: wait green
+    shell: "curl -s -m 2 localhost:9200/_cat/health | cut -d ' ' -f 4"
+    register: result
+    until: result.stdout.find("green") != -1
+    retries: 180
+    delay: 10
